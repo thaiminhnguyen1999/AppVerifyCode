@@ -111,5 +111,4 @@ app.post('/api/otpVerification', async (req, res) => {
     }
 });
 
-// Export as Vercel Serverless function
 module.exports = app;
