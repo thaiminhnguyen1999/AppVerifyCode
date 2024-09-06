@@ -9,9 +9,8 @@ const SHEET_ID = process.env.SHEET_ID;
 const RANGE = process.env.RANGE;
 const telegramApiUrl = process.env.TELEGRAM_API_URL;
 const SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly'];
-
 const auth = new google.auth.GoogleAuth({
-    credentials: JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON),
+    keyFile: process.env.GOOGLE_APPLICATION_CREDENTIALS,
     scopes: SCOPES
 });
 
@@ -111,6 +110,8 @@ app.post('/api/otpVerification', async (req, res) => {
         return res.status(404).json({ "status": "authkey not found" });
     }
 });
+
+
 
 app.listen(process.env.PORT || 3000, () => {
     console.log(`Server running on port ${process.env.PORT || 3000}`);
