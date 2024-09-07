@@ -105,11 +105,11 @@ app.post('/api/otpVerification', async (req, res) => {
 
     if (row) {
         const randomCode = Math.floor(Math.random() * (99999999 - 10000000 + 1)) + 10000000;
-        const message = escapeMarkdownV2(`Your verification code is ||*${randomCode}*||. Please keep it secret and don't share it with anyone.\nCode sent by *${row[1]} (${row[2]})*.`);
+        const message = `Your verification code is ||*${randomCode}*||\\. Please keep it secret and don\\'t share it with anyone\\.\\\nCode sent by *${row[1]} \\(${row[2]}\\)\\*\\.`;
 
 
         try {
-            console.log(`Sending request to Telegram API: ${telegramApiUrl}`); // Log URL
+            console.log(`Sending request to Telegram API: ${telegramApiUrl}`);
 
             const telegramRes = await axios.post(telegramApiUrl, {
                 chat_id: chat_id,
