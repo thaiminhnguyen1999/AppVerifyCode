@@ -2,6 +2,8 @@ require('dotenv').config();
 const express = require('express');
 const axios = require('axios');
 const { google } = require('googleapis');
+const TelegramBot = require('node-telegram-bot-api');
+
 const app = express();
 app.use(express.json());
 
@@ -12,6 +14,42 @@ const SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly'];
 const auth = new google.auth.GoogleAuth({
     keyFile: process.env.GOOGLE_APPLICATION_CREDENTIALS,
     scopes: SCOPES
+});
+
+const API_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+const bot = new TelegramBot(API_TOKEN, { polling: true });
+
+function escapeMarkdownV2(text) {
+    const escapeChars = /([_\*\[\]\(\)\~\`\>\#\+\-\=\|\{\}\.\!\\])/g;
+    return text.replace(escapeChars, '\\$1');
+}
+
+bot.onText(/\/start/, (msg) => {
+    const chatId = msg.chat.id;
+    const message = `Your ChatID is *${chatId}*. Please enter this ChatID into the app to receive OTP verification code.`;
+    bot.sendMessage(chatId, message, { parse_mode: 'Markdown' });
+});
+
+bot.onText(/\/create/, (msg) => {
+    const chatId = msg.chat.id;
+
+    let responseText = "Welcome to *AppVerify Code*, a *free* OTP verification code sending service for *individuals and businesses*.\n" +
+        "Instead of having to pay to use OTP verification services, you just need to register to use *AppVerify Code*'s service " +
+        "with a little understanding of API and you can use it.";
+
+    const buttonText = 'Register';
+    const url = 'https://appverifycode.glide.page/';
+
+    const options = {
+        reply_markup: {
+            inline_keyboard: [
+                [{ text: buttonText, url: url }]
+            ]
+        },
+        parse_mode: 'Markdown'
+    };
+
+    bot.sendMessage(chatId, responseText, options);
 });
 
 async function getSheetData() {
@@ -66,7 +104,7 @@ app.post('/api/otpVerification', async (req, res) => {
 
     if (row) {
         const randomCode = Math.floor(Math.random() * (99999999 - 10000000 + 1)) + 10000000;
-        const message = `Your verification code is ||*${randomCode}*||\\. Please keep it secret and don\\'t share it with anyone\\.\\\n\\Code sent by *${row[1]}*\\.`;
+        const message = `Your verification code is ||*${randomCode}*||\\. Please keep it secret and don\\'t share it with anyone\\.\\nCode sent by *${row[1]}*\\.`;
 
 
         try {
@@ -110,8 +148,6 @@ app.post('/api/otpVerification', async (req, res) => {
         return res.status(404).json({ "status": "authkey not found" });
     }
 });
-
-
 
 app.listen(process.env.PORT || 3000, () => {
     console.log(`Server running on port ${process.env.PORT || 3000}`);
