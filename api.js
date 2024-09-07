@@ -24,6 +24,7 @@ function escapeMarkdownV2(text) {
     return text.replace(escapeChars, '\\$1');
 }
 
+
 bot.onText(/\/start/, (msg) => {
     const chatId = msg.chat.id;
     const message = `Your ChatID is *${chatId}*. Please enter this ChatID into the app to receive OTP verification code.`;
@@ -104,7 +105,7 @@ app.post('/api/otpVerification', async (req, res) => {
 
     if (row) {
         const randomCode = Math.floor(Math.random() * (99999999 - 10000000 + 1)) + 10000000;
-        const message = `Your verification code is ||*${randomCode}*||\\. Please keep it secret and don\\'t share it with anyone\\.\\\nCode sent by *${row[1]} \\(${row[2]}\\)*\\.`;
+        const message = escapeMarkdownV2(`Your verification code is ||*${randomCode}*||. Please keep it secret and don't share it with anyone.\nCode sent by *${row[1]} (${row[2]})*.`);
 
 
         try {
