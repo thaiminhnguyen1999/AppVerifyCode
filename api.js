@@ -70,7 +70,7 @@ app.post('/api/otpVerification', async (req, res) => {
 
 
         try {
-            console.log(`Sending request to Telegram API: ${telegramApiUrl}`);
+            console.log(`Sending request to Telegram API: ${telegramApiUrl}`); // Log URL
 
             const telegramRes = await axios.post(telegramApiUrl, {
                 chat_id: chat_id,
