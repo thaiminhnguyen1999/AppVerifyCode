@@ -24,11 +24,10 @@ function escapeMarkdownV2(text) {
     return text.replace(escapeChars, '\\$1');
 }
 
-
 bot.onText(/\/start/, (msg) => {
     const chatId = msg.chat.id;
     const message = `Your ChatID is *${chatId}*. Please enter this ChatID into the app to receive OTP verification code.`;
-    bot.sendMessage(chatId, message, { parse_mode: 'Markdown' });
+    bot.sendMessage(chatId, message, { parse_mode: 'MarkdownV2' });
 });
 
 bot.onText(/\/create/, (msg) => {
@@ -47,7 +46,7 @@ bot.onText(/\/create/, (msg) => {
                 [{ text: buttonText, url: url }]
             ]
         },
-        parse_mode: 'Markdown'
+        parse_mode: 'MarkdownV2'
     };
 
     bot.sendMessage(chatId, responseText, options);
@@ -105,12 +104,10 @@ app.post('/api/otpVerification', async (req, res) => {
 
     if (row) {
         const randomCode = Math.floor(Math.random() * (99999999 - 10000000 + 1)) + 10000000;
-        const message = `Your verification code is \\|\\|\\*${randomCode}\\*\\|\\|\\. Please keep it secret and don\\'t share it with anyone\\.\\\nCode sent by \\*${row[1]} \\(${row[2]}\\)\\*\\.`;
+        const message = `Your verification code is \\|\\|\\*${randomCode}\\*\\|\\|\\. Please keep it secret and don\\'t share it with anyone\\.\\\nCode sent by \\*${escapeMarkdownV2(row[1])} \\(${escapeMarkdownV2(row[2])}\\)\\*\\.`;
 
 
         try {
-            console.log(`Sending request to Telegram API: ${telegramApiUrl}`);
-
             const telegramRes = await axios.post(telegramApiUrl, {
                 chat_id: chat_id,
                 text: message,
@@ -138,11 +135,9 @@ app.post('/api/otpVerification', async (req, res) => {
                 };
                 return res.json(response);
             } else {
-                console.error('Failed to send Telegram message:', telegramRes.data);
                 return res.status(500).json({ error: 'Failed to send Telegram message', details: telegramRes.data });
             }
         } catch (error) {
-            console.error('Telegram API error:', error.response ? error.response.data : error.message);
             return res.status(500).json({ error: 'Telegram API error', details: error.response ? error.response.data : error.message });
         }
     } else {
