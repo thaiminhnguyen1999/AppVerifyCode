@@ -58,8 +58,8 @@ bot.onText(/\/create/, (msg) => {
     const options = {
         reply_markup: {
             inline_keyboard: [
-                [{ text: "✔ Register", url: "https://appverifycode.glide.page" }]
-                [{ text: "📃 Document", url: "https://hitech-corporation.gitbook.io/appverifycode-api/"}]
+                [{ text: "✔ Register", url: "https://appverifycode.glide.page" }],
+                [{ text: "📃 Document", url: "https://hitech-corporation.gitbook.io/appverifycode-api/" }]
             ]
         },
         parse_mode: 'MarkdownV2'
@@ -67,6 +67,7 @@ bot.onText(/\/create/, (msg) => {
 
     bot.sendMessage(chatId, responseText, options);
 });
+
 
 async function getSheetData() {
     const client = await auth.getClient();
