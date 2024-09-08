@@ -55,13 +55,11 @@ bot.onText(/\/create/, (msg) => {
         "Instead of having to pay to use OTP verification services\\, you just need to register to use *AppVerify Code*'s service " +
         "with a little understanding of API and you can use it\\.";
 
-    const buttonText = 'Register';
-    const url = 'https://appverifycode.glide.page/';
-
     const options = {
         reply_markup: {
             inline_keyboard: [
-                [{ text: buttonText, url: url }]
+                [{ text: "✔ Register", url: "https://appverifycode.glide.page" }]
+                [{ text: "📃 Document", url: "https://hitech-corporation.gitbook.io/appverifycode-api/"}]
             ]
         },
         parse_mode: 'MarkdownV2'
