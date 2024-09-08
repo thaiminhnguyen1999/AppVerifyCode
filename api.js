@@ -9,7 +9,7 @@ app.use(express.json());
 
 const SHEET_ID = process.env.SHEET_ID;
 const RANGE = process.env.RANGE;
-const telegramApiUrl = process.env.TELEGRAM_API_URL;
+const telegramApiUrl = `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`;
 const SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly'];
 const auth = new google.auth.GoogleAuth({
     keyFile: process.env.GOOGLE_APPLICATION_CREDENTIALS,
@@ -20,22 +20,40 @@ const API_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const bot = new TelegramBot(API_TOKEN, { polling: true });
 
 function escapeMarkdownV2(text) {
-    const escapeChars = /([_\*\[\]\(\)\~\`\>\#\+\-\=\|\{\}\.\!\\])/g;
-    return text.replace(escapeChars, '\\$1');
+    return text
+        .replace(/\\/g, '\\\\')
+        .replace(/\./g, '\\.')
+        .replace(/\-/g, '\\-')
+        .replace(/\_/g, '\\_')
+        .replace(/\*/g, '\\*')
+        .replace(/\[/g, '\\[')
+        .replace(/\]/g, '\\]')
+        .replace(/\(/g, '\\(')
+        .replace(/\)/g, '\\)')
+        .replace(/\~/g, '\\~')
+        .replace(/\`/g, '\\`')
+        .replace(/\>/g, '\\>')
+        .replace(/\#/g, '\\#')
+        .replace(/\+/g, '\\+')
+        .replace(/\=/g, '\\=')
+        .replace(/\|/g, '\\|')
+        .replace(/\{/g, '\\{')
+        .replace(/\}/g, '\\}')
+        .replace(/\!/g, '\\!');
 }
 
 bot.onText(/\/start/, (msg) => {
     const chatId = msg.chat.id;
-    const message = `Your ChatID is *${chatId}*. Please enter this ChatID into the app to receive OTP verification code.`;
+    const message = `Your ChatID is *${chatId}*\\. Please enter this ChatID into the app to receive OTP verification code\\.`;
     bot.sendMessage(chatId, message, { parse_mode: 'MarkdownV2' });
 });
 
 bot.onText(/\/create/, (msg) => {
     const chatId = msg.chat.id;
 
-    let responseText = "Welcome to *AppVerify Code*, a *free* OTP verification code sending service for *individuals and businesses*.\n" +
-        "Instead of having to pay to use OTP verification services, you just need to register to use *AppVerify Code*'s service " +
-        "with a little understanding of API and you can use it.";
+    let responseText = "Welcome to *AppVerify Code*\\, a *free* OTP verification code sending service for *individuals and businesses*\\.\n" +
+        "Instead of having to pay to use OTP verification services\\, you just need to register to use *AppVerify Code*'s service " +
+        "with a little understanding of API and you can use it\\.";
 
     const buttonText = 'Register';
     const url = 'https://appverifycode.glide.page/';
@@ -104,7 +122,8 @@ app.post('/api/otpVerification', async (req, res) => {
 
     if (row) {
         const randomCode = Math.floor(Math.random() * (99999999 - 10000000 + 1)) + 10000000;
-        const message = `Your verification code is ${randomCode}. Please keep it secret and don't share it with anyone.\nCode sent by *${escapeMarkdownV2(row[1])}* (${escapeMarkdownV2(row[2])}).`;
+
+        const message = `Your verification code is ||*${escapeMarkdownV2(randomCode.toString())}*||\\. Please keep it secret and don't share it with anyone\\.\nCode sent by *${escapeMarkdownV2(row[1])}* \\(${escapeMarkdownV2(row[2])}\\)\\.`;
 
         try {
             const telegramRes = await axios.post(telegramApiUrl, {
@@ -129,7 +148,6 @@ app.post('/api/otpVerification', async (req, res) => {
                         "sendTo": chat_id,
                         "content": message
                     },
-
                     "verificationCode": randomCode
                 };
                 return res.json(response);
