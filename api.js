@@ -211,11 +211,7 @@ app.post('/api/email/otpVerification', async (req, res) => {
     if (row) {
         const randomCode = Math.floor(Math.random() * (99999999 - 10000000 + 1)) + 10000000;
 
-        const emailMessage = `
-            <div style="text-align: center; font-weight: bold;">AppVerify Code</div>
-            <p>Your verification code is <strong>${randomCode}</strong>. Please keep it secret and don't share it with anyone.</p>
-            <p>Code sent by <strong>${row[1]} (${row[2]})</strong>.</p>
-        `;
+        const sanitizedTelegramBot = row[2].replace(/@/g, '');
 
         const transporter = await createTransporter();
         const mailOptions = {
@@ -225,7 +221,7 @@ app.post('/api/email/otpVerification', async (req, res) => {
             html: `
                 <div style="text-align: center; font-weight: bold;"><h1>AppVerify Code</h1></div>
                 <p>Your verification code is <strong>${randomCode}</strong>. Please keep it secret and don't share it with anyone.</p>
-                <p>Code sent by <strong>${row[1]} (${row[2]})</strong>.</p>
+                <p>Code sent by <strong>${row[1]} (<a href="https://t.me/${sanitizedTelegramBot}">${row[2]}</a>)</strong>.</p>
                 <img src="cid:mailfooter" alt="Mail Footer" style="width: 100% !important; min-width: 100% !important;" />
             `,
             attachments: [{
@@ -235,8 +231,7 @@ app.post('/api/email/otpVerification', async (req, res) => {
             }]
         };
 
-
-        transporter.sendMail(mailOptions, (error, info) => {
+        transporter.sendMail(mailOptions, (error) => {
             if (error) {
                 return res.status(500).json({ error: 'Failed to send email', details: error.message });
             } else {
@@ -260,11 +255,11 @@ app.post('/api/email/otpVerification', async (req, res) => {
         return res.status(404).json({
             "restful-method": "POST",
             "response": "404",
-
             "error": "avc_authkey not found"
         });
     }
 });
+
 
 app.listen(process.env.PORT || 3000, () => {
     console.log(`Server running on port ${process.env.PORT || 3000}`);
