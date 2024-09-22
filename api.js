@@ -102,13 +102,13 @@ async function getSheetData() {
     return res.data.values;
 }
 
-app.get('/api/telegram/otpVerification', (req, res) => {
+app.get('/api/telegram/otpVerification', (_req, res) => {
     return res.status(405).json({
         "error": "GET method is not supported for /api/telegram/otpVerification. Do you mean /api/getData?"
     });
 });
 
-app.get('/api/email/otpVerification', (req, res) => {
+app.get('/api/email/otpVerification', (_req, res) => {
     return res.status(405).json({
         "error": "GET method is not supported for /api/email/otpVerification. Do you mean /api/getData?"
     });
@@ -137,7 +137,12 @@ app.get('/api/getData', async (req, res) => {
         };
         return res.json(response);
     } else {
-        return res.status(404).json({ "status": "authkey not found" });
+        return res.status(404).json({ 
+            "restful-method": "GET",
+            "response": "404",
+
+            "error": "avc_authkey not found" 
+        });
     }
 });
 
@@ -185,7 +190,12 @@ app.post('/api/telegram/otpVerification', async (req, res) => {
             return res.status(500).json({ error: 'Telegram API error', details: error.message });
         }
     } else {
-        return res.status(404).json({ "status": "authkey not found" });
+        return res.status(404).json({
+            "restful-method": "POST",
+            "response": "404",
+
+            "error": "avc_authkey not found"
+        });
     }
 });
 
@@ -202,9 +212,9 @@ app.post('/api/email/otpVerification', async (req, res) => {
         const randomCode = Math.floor(Math.random() * (99999999 - 10000000 + 1)) + 10000000;
 
         const emailMessage = `
-        <div style="text-align: center; font-weight: bold;">AppVerify Code</div>
-        <p>Your verification code is <strong>${randomCode}</strong>. Please keep it secret and don't share it with anyone.</p>
-        <p>Code sent by <strong>${row[1]} (${row[2]})</strong>.</p>
+            <div style="text-align: center; font-weight: bold;">AppVerify Code</div>
+            <p>Your verification code is <strong>${randomCode}</strong>. Please keep it secret and don't share it with anyone.</p>
+            <p>Code sent by <strong>${row[1]} (${row[2]})</strong>.</p>
         `;
 
         const transporter = await createTransporter();
@@ -213,10 +223,10 @@ app.post('/api/email/otpVerification', async (req, res) => {
             to: email,
             subject: 'AppVerify Code - OTP Verification',
             html: `
-                <div style="text-align: center; font-weight: bold;">AppVerify Code</div>
+                <div style="text-align: center; font-weight: bold;"><h1>AppVerify Code</h1></div>
                 <p>Your verification code is <strong>${randomCode}</strong>. Please keep it secret and don't share it with anyone.</p>
                 <p>Code sent by <strong>${row[1]} (${row[2]})</strong>.</p>
-                <img src="cid:mailfooter" alt="Mail Footer" />
+                <img src="cid:mailfooter" alt="Mail Footer" style="width: 100% !important; min-width: 100% !important;" />
             `,
             attachments: [{
                 filename: 'mail-footer.jpg',
@@ -247,7 +257,12 @@ app.post('/api/email/otpVerification', async (req, res) => {
             }
         });
     } else {
-        return res.status(404).json({ "status": "authkey not found" });
+        return res.status(404).json({
+            "restful-method": "POST",
+            "response": "404",
+
+            "error": "avc_authkey not found"
+        });
     }
 });
 
