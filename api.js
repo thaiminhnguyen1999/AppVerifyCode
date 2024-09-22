@@ -76,8 +76,8 @@ bot.onText(/\/start/, (msg) => {
 
 bot.onText(/\/create/, (msg) => {
     const chatId = msg.chat.id;
-    const responseText = "Welcome to *AppVerify Code*\\, a *free* OTP verification code sending service for *individuals and businesses*\\.\n" +
-        "Register to use *AppVerify Code*'s API with a little understanding of API usage.";
+    const responseText = "Welcome to *AppVerify Code*\\, a *free* OTP verification code sending service for *individuals and businesses*\\.\\\n" +
+        "Register to use *AppVerify Code*\\'s API with a little understanding of API usage\\.";
 
     const options = {
         reply_markup: {
