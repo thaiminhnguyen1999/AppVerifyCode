@@ -12,7 +12,7 @@ To use **AppVerify Code**, you must have some understanding of API.
 **Notes:**
 
 * **AppVerify Code** only supports two methods `GET` and `POST`.
-* For `GET` method, only one `params` is used, `avc_authkey; POST` uses two`params`, `avc_authkey andchat_id.`
+* For `GET` method, only one `params` is used, `avc_authkey; POST` uses two`params`, `avc_authkey`and `chat_id`
 {% endhint %}
 
 ### URL Structure
